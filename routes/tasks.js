@@ -1,48 +1,49 @@
 const express = require('express');
 const router = express.Router();
 
-let tasks = [];
-let currentId = 1;
+// Données simulées en mémoire
+let tasks = [
+  { id: 1, title: 'Tâche 1', completed: false },
+  { id: 2, title: 'Tâche 2', completed: true },
+];
 
-// GET /tasks - Liste toutes les tâches
+// GET /tasks - Récupérer toutes les tâches
 router.get('/', (req, res) => {
   res.json(tasks);
 });
 
-// GET /tasks/:id - Tâche par ID
+// GET /tasks/:id - Récupérer une tâche spécifique
 router.get('/:id', (req, res) => {
-  const task = tasks.find(t => t.id === parseInt(req.params.id));
-  if (!task) return res.status(404).json({ message: 'Tâche non trouvée' });
+  const task = tasks.find(t => t.id == req.params.id);
+  if (!task) return res.status(404).json({ error: 'Tâche non trouvée' });
   res.json(task);
 });
 
-// POST /tasks - Nouvelle tâche
+// POST /tasks - Créer une nouvelle tâche
 router.post('/', (req, res) => {
-  const { title, completed = false } = req.body;
-  const newTask = { id: currentId++, title, completed };
+  const { title } = req.body;
+  const newTask = { id: Date.now(), title, completed: false };
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
 
-// PUT /tasks/:id - Modifier une tâche
+// PUT /tasks/:id - Mettre à jour une tâche
 router.put('/:id', (req, res) => {
-  const task = tasks.find(t => t.id === parseInt(req.params.id));
-  if (!task) return res.status(404).json({ message: 'Tâche non trouvée' });
-
-  const { title, completed } = req.body;
-  if (title !== undefined) task.title = title;
-  if (completed !== undefined) task.completed = completed;
-
-  res.json(task);
+  const index = tasks.findIndex(t => t.id == req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Tâche non trouvée' });
+  tasks[index] = { ...tasks[index], ...req.body };
+  res.json(tasks[index]);
 });
 
 // DELETE /tasks/:id - Supprimer une tâche
 router.delete('/:id', (req, res) => {
-  const index2 = tasks.findIndex(t => t.id === parseInt(req.params.id));
-  if (index2 === -1) return res.status(404).json({ message: 'Tâche non trouvée' });
-
-  const deletedTask = tasks.splice(index2, 1);
-  res.json(deletedTask[0]);
+  tasks = tasks.filter(t => t.id != req.params.id);
+  res.status(204).send();
 });
 
 module.exports = router;
+router.get('/', (req, res) => {
+  console.log('GET /tasks appelée');
+  res.json(tasks);
+});
+
