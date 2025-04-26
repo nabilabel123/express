@@ -15,10 +15,13 @@ ou
  ```
 ## pour tester le projet : http://localhost:3000/hello  and http://localhost:3000/date  
 ## affichage: (Hello World)
+
    ![image](https://github.com/user-attachments/assets/3abb1602-853c-44c2-b873-9a4f32be3c44)
 
 ## (Date et heure actuelles)
-    ![Uploading image.png…]()
+    
+
+![Uploading Capture d’écran 2025-04-26 112708.png…]()
 
 
 
