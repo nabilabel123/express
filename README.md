@@ -19,9 +19,13 @@ ou
    ![image](https://github.com/user-attachments/assets/3abb1602-853c-44c2-b873-9a4f32be3c44)
 
 ## (Date et heure actuelles)
-    
+![image](https://github.com/user-attachments/assets/8ece7686-b31a-4e56-a912-b4ef4b691c87)
 
-![Uploading Capture d’écran 2025-04-26 112708.png…]()
+## Exercice 2: Configuration d'un projet ExpressJS
+Créez un projet ExpressJS complet avec la structure de répertoires recommandée et configurez-le pour servir des fichiers statiques et gérer différentes routes.
+
+
+   
 
 
 
