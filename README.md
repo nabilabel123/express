@@ -1,4 +1,4 @@
-<img width="770" alt="image" src="https://github.com/user-attachments/assets/6b2da648-4f42-4990-b6cd-756d9329bdf6" /><img width="770" alt="image" src="https://github.com/user-attachments/assets/dc570dd7-c634-4300-b7fd-5d94d37ca358" />## I - Introduction à ExpressJS
+## I - Introduction à ExpressJS
 ## Exercice 1: Créer un serveur ExpressJS simple
 Créez un serveur ExpressJS qui répond "Hello World" sur la route principale et affiche la date et l'heure actuelles sur la route "/date".
 ## Installation
@@ -48,10 +48,11 @@ ou
    node server.js
  ```
 ## pour tester le projet :(http://localhost:3000/tasks-page)
+
 <img width="770" alt="Capture d’écran 2025-04-26 115208" src="https://github.com/user-attachments/assets/9af55823-422d-4ab4-92be-c89826a56470" />
 
 
-<img width="770" alt="Capture d’écran 2025-04-26 115208" src="https://github.com/user-attachments/assets/be3be81c-02bf-4da0-9cbf-77fd120b1959" />
+
 
 
 
