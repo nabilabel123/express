@@ -18,7 +18,7 @@ ou
    ![image](https://github.com/user-attachments/assets/3abb1602-853c-44c2-b873-9a4f32be3c44)
 
 ## (Date et heure actuelles)
-    <img width="531" alt="image" src="https://github.com/user-attachments/assets/d712d93c-5016-4721-835d-54dbe74ef061" />
+     ![image](https://github.com/user-attachments/assets/d712d93c-5016-4721-835d-54dbe74ef061)
 
 
 
