@@ -2,6 +2,8 @@
 const express = require('express');
 const path = require('path');
 
+
+
 // Créer une instance d'application Express
 const app = express();
 
@@ -12,7 +14,81 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
+// Configuration de l'application
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views')); 
 
+//routes
+const tasksRouter = require('./routes/tasks');
+const blogRouter = require('./routes/blog');
+const usersRouter = require('./routes/modules/users');
+const productsRouter = require('./routes/modules/products');
+const ordersRouter = require('./routes/modules/orders');
+
+// Routes pour les pages HTML
+app.get('/tasks-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'tasks.html'), {
+      headers: {
+          'Content-Type': 'text/html'
+      }
+  });
+});
+app.get('/blog-page', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'blog.html'));
+});
+app.get('/admin-dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin-dashboard.html'));
+});
+app.get('/inscription', (req, res) => {
+  res.render('form', { 
+      errors: {}, // Toujours initialiser comme objet vide
+      formData: {} // Idem pour formData
+  });
+});
+
+app.post('/inscription', (req, res) => {
+  const { nom, email, password, confirmPassword } = req.body;
+  const errors = {};
+  const formData = { nom, email };
+
+  // Validation des données
+  if (!nom) errors.nom = 'Le nom est requis';
+  
+  if (!email) {
+      errors.email = 'L\'email est requis';
+  } else if (!/^\S+@\S+\.\S+$/.test(email)) {
+      errors.email = 'L\'email n\'est pas valide';
+  }
+  
+  if (!password) {
+      errors.password = 'Le mot de passe est requis';
+  } else if (password.length < 6) {
+      errors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+  }
+  
+  if (!confirmPassword) {
+      errors.confirmPassword = 'Veuillez confirmer votre mot de passe';
+  } else if (password !== confirmPassword) {
+      errors.confirmPassword = 'Les mots de passe ne correspondent pas';
+  }
+
+  if (Object.keys(errors).length > 0) {
+      return res.render('form', { 
+          errors, 
+          formData 
+      });
+  }
+
+  res.render('confirmation', { nom });
+});
+// Middleware pour les fichiers statiques
+// Montez les routeurs
+
+app.use('/tasks', tasksRouter);
+app.use('/blog', blogRouter);
+app.use('/users', usersRouter);
+app.use('/products', productsRouter);
+app.use('/orders', ordersRouter);
 // Middleware personnalisé pour le logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -21,7 +97,8 @@ app.use((req, res, next) => {
 });
 
 // Route principale qui renvoie "Hello World" avec un beau design
-app.get('/', (req, res) => {
+
+app.get('/hello', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html lang="fr">
@@ -334,7 +411,7 @@ app.get('/date', (req, res) => {
           <div class="date">${prettyDate.split(' à ')[0]}</div>
           <div class="time pulse">${prettyDate.split(' à ')[1]}</div>
         </div>
-        <a href="/" class="btn">Retour à l'accueil</a>
+        <a href="/hello" class="btn">Retour à l'accueil</a>
         <div class="server-info">
           Serveur propulsé par <span class="highlight">Express.js</span>
         </div>
@@ -356,6 +433,7 @@ app.get('/api/date', (req, res) => {
     }
   });
 });
+
 
 // Middleware pour gérer les routes non trouvées
 app.use((req, res) => {
@@ -476,9 +554,18 @@ app.use((req, res) => {
 });
 
 // Démarrer le serveur
+
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
-  console.log('Routes disponibles:');
-  console.log(`- http://localhost:${PORT}/ (Hello World)`);
-  console.log(`- http://localhost:${PORT}/date (Date et heure actuelles)`);
-});
+  console.log(`Serveur démarré:
+  - Accueil: http://localhost:${PORT}
+  - Page Basic: http://localhost:${PORT}/hello (Hello World)
+  - Dat: http://localhost:${PORT}/date (Date et heure actuelles)
+  - API Tâches: http://localhost:${PORT}/tasks
+  - Interface Tâches: http://localhost:${PORT}/tasks-page
+   - Blog API: http://localhost:${PORT}/blog
+    - Interface Blog: http://localhost:${PORT}/blog-page
+     - Interface Admin: http://localhost:${PORT}/admin-dashboard
+      http://localhost:${PORT}/inscription
+ `);
+  
+                });

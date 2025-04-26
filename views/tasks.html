@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrganizeMe - Gestion de Tâches</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --accent: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-50);
+            color: var(--gray-800);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: background-color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--gray-100);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--gray-800);
+        }
+
+        .filters {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        .filter-item:hover {
+            background-color: var(--gray-100);
+        }
+
+        .filter-item.active {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+        }
+
+        .filter-icon {
+            margin-right: 0.75rem;
+        }
+
+        .filter-count {
+            margin-left: auto;
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            background-color: white;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .btn-icon {
+            margin-right: 0.5rem;
+        }
+
+        .add-task-form {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--gray-800);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            background-color: var(--gray-200);
+            color: var(--gray-700);
+        }
+
+        .btn-cancel:hover {
+            background-color: var(--gray-300);
+        }
+
+        .tasks-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .task-item {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-checkbox {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+        }
+
+        .task-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            border: 2px solid var(--gray-400);
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .task-checkbox input:checked ~ .checkmark {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .task-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: var(--gray-800);
+        }
+
+        .completed .task-title {
+            text-decoration: line-through;
+            color: var(--gray-600);
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .task-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .priority-high {
+            background-color: var(--danger);
+        }
+
+        .priority-medium {
+            background-color: var(--warning);
+        }
+
+        .priority-low {
+            background-color: var(--primary);
+        }
+
+        .task-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            background: none;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--gray-500);
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .btn-edit:hover {
+            color: var(--primary);
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            background-color: white;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: var(--gray-300);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--gray-800);
+        }
+
+        .empty-state-text {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        /* Animation de pulsation pour les boutons */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Animation pour le mode sombre */
+        .dark {
+            background-color: var(--gray-900);
+            color: var(--gray-100);
+        }
+
+        .dark .sidebar, 
+        .dark .task-item, 
+        .dark .add-task-form,
+        .dark .empty-state {
+            background-color: var(--gray-800);
+            color: var(--gray-100);
+        }
+
+        .dark .sidebar-title,
+        .dark .section-title,
+        .dark .form-title,
+        .dark .task-title,
+        .dark .empty-state-title {
+            color: var(--gray-100);
+        }
+
+        .dark .navbar {
+            border-bottom-color: var(--gray-800);
+        }
+
+        .dark .form-input,
+        .dark .form-select,
+        .dark .search-input {
+            background-color: var(--gray-700);
+            border-color: var(--gray-600);
+            color: var(--gray-100);
+        }
+
+        .dark .form-label {
+            color: var(--gray-300);
+        }
+
+        .dark .checkmark {
+            border-color: var(--gray-500);
+        }
+
+        .dark .btn-cancel {
+            background-color: var(--gray-700);
+            color: var(--gray-300);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <div class="logo">OrganizeMe</div>
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+        </nav>
+
+        <div class="dashboard">
+            <aside class="sidebar">
+                <h2 class="sidebar-title">Filtres</h2>
+                <div class="filters">
+                    <div class="filter-item active" data-filter="all">
+                        <svg class="filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Toutes les tâches
+                        <span class="filter-count" id="all-count">0</span>
+                    </div>
+                    <div class="filter-item" data-filter="pending">
+                        <svg class="filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        En attente
+                        <span class="filter-count" id="pending-count">0</span>
+                    </div>
+                    <div class="filter-item" data-filter="completed">
+                        <svg class="filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Terminées
+                        <span class="filter-count" id="completed-count">0</span>
+                    </div>
+                    <div class="filter-item" data-filter="high">
+                        <svg class="filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        Priorité haute
+                        <span class="filter-count" id="high-count">0</span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="tasks-header">
+                    <h1 class="section-title">Mes tâches</h1>
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchTasks" placeholder="Rechercher des tâches...">
+                        <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="showAddForm">
+                    <svg class="btn-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Nouvelle tâche
+                </button>
+
+                <div class="add-task-form" id="addTaskForm">
+                    <h2 class="form-title">Créer une nouvelle tâche</h2>
+                    <form id="taskForm">
+                        <div class="form-group">
+                            <label class="form-label" for="taskTitle">Titre de la tâche</label>
+                            <input type="text" class="form-input" id="taskTitle" placeholder="Que devez-vous faire?" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="taskPriority">Priorité</label>
+                            <select class="form-select" id="taskPriority">
+                                <option value="low">Faible</option>
+                                <option value="medium">Moyenne</option>
+                                <option value="high">Haute</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="taskStatus">Statut</label>
+                            <select class="form-select" id="taskStatus">
+                                <option value="pending">En attente</option>
+                                <option value="completed">Terminée</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-cancel" id="cancelAdd">Annuler</button>
+                            <button type="submit" class="btn btn-primary">
+                                <svg class="btn-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Enregistrer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="tasks-list" id="tasksList">
+                    <!-- Les tâches seront ajoutées ici dynamiquement -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Éléments DOM
+            const showAddFormBtn = document.getElementById('showAddForm');
+            const addTaskForm = document.getElementById('addTaskForm');
+            const cancelAddBtn = document.getElementById('cancelAdd');
+            const taskForm = document.getElementById('taskForm');
+            const tasksList = document.getElementById('tasksList');
+            const searchInput = document.getElementById('searchTasks');
+            const filterItems = document.querySelectorAll('.filter-item');
+            const themeToggle = document.getElementById('themeToggle');
+            const allCountEl = document.getElementById('all-count');
+            const pendingCountEl = document.getElementById('pending-count');
+            const completedCountEl = document.getElementById('completed-count');
+            const highCountEl = document.getElementById('high-count');
+            
+            // État de l'application
+            let tasks = [
+                {
+                    id: 1,
+                    title: "Préparer la présentation client",
+                    status: "pending",
+                    priority: "high",
+                    createdAt: new Date().toISOString().split('T')[0]
+                },
+                {
+                    id: 2,
+                    title: "Acheter des provisions",
+                    status: "completed",
+                    priority: "medium",
+                    createdAt: new Date().toISOString().split('T')[0]
+                },
+                {
+                    id: 3,
+                    title: "Réviser pour l'examen de JavaScript",
+                    status: "pending",
+                    priority: "low",
+                    createdAt: new Date().toISOString().split('T')[0]
+                }
+            ];
+            let currentFilter = 'all';
+            let darkMode = false;
+            
+            // Afficher/masquer le formulaire
+            showAddFormBtn.addEventListener('click', () => {
+                addTaskForm.style.display = 'block';
+                document.getElementById('taskTitle').focus();
+            });
+            
+            cancelAddBtn.addEventListener('click', () => {
+                addTaskForm.style.display = 'none';
+                taskForm.reset();
+            });
+            
+            // Soumission du formulaire
+            taskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const title = document.getElementById('taskTitle').value;
+                const priority = document.getElementById('taskPriority').value;
+                const status = document.getElementById('taskStatus').value;
+                
+                const newTask = {
+                    id: Date.now(),
+                    title,
+                    status,
+                    priority,
+                    createdAt: new Date().toISOString().split('T')[0]
+                };
+                
+                tasks.push(newTask);
+                addTaskForm.style.display = 'none';
+                taskForm.reset();
+                renderTasks();
+            });
+            
+            // Filtrer les tâches
+            filterItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    filterItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    currentFilter = item.dataset.filter;
+                    renderTasks();
+                });
+            });
+            
+            // Recherche
+            searchInput.addEventListener('input', () => {
+                renderTasks();
+            });
+            
+            // Basculer le thème
+            themeToggle.addEventListener('click', () => {
+                darkMode = !darkMode;
+                document.body.classList.toggle('dark', darkMode);
+                
+                if (darkMode) {
+                    themeToggle.innerHTML = `
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    `;
+                } else {
+                    themeToggle.innerHTML = `
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    `;
+                }
+            });
+            
+            // Mettre à jour les compteurs
+            function updateCounters() {
+                allCountEl.textContent = tasks.length;
+                pendingCountEl.textContent = tasks.filter(t => t.status === 'pending').length;
+                completedCountEl.textContent = tasks.filter(t => t.status === 'completed').length;
+                highCountEl.textContent = tasks.filter(t => t.priority === 'high').length;
+            }
+            
+            // Fonctions pour manipuler les tâches
+            window.toggleTaskStatus = function(id) {
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    task.status = task.status === 'completed' ? 'pending' : 'completed';
+                    renderTasks();
+                }
+            };
+            
+            window.deleteTask = function(id) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?')) {
+                    tasks = tasks.filter(t => t.id !== id);
+                    renderTasks();
+                }
+            };
+            
+            window.editTask = function(id) {
+                const task = tasks.find(t => t.id === id);
+                if (task) {
+                    const newTitle = prompt('Modifier le titre de la tâche:', task.title);
+                    if (newTitle && newTitle.trim() !== '') {
+                        task.title = newTitle;
+                        renderTasks();
+                    }
+                }
+            };
+            
+            // Afficher les tâches
+            function renderTasks() {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                // Filtrer les tâches
+                let filteredTasks = tasks.filter(task => {
+                    const matchesSearch = task.title.toLowerCase().includes(searchTerm);
+                    
+                    if (currentFilter === 'all') return matchesSearch;
+                    if (currentFilter === 'pending') return task.status === 'pending' && matchesSearch;
+                    if (currentFilter === 'completed') return task.status === 'completed' && matchesSearch;
+                    if (currentFilter === 'high') return task.priority === 'high' && matchesSearch;
+                    // Fin de la condition if (currentFilter === 'high')
+                    return task.priority === 'high' && matchesSearch;
+                    
+                    // Cette ligne ne sera jamais atteinte car tous les cas sont couverts
+                    // mais elle est laissée par sécurité
+                    return false;
+                });
+                
+                // Mettre à jour les compteurs
+                updateCounters();
+                
+                // Afficher les tâches ou un message si la liste est vide
+                if (filteredTasks.length === 0) {
+                    tasksList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                            </div>
+                            <h3 class="empty-state-title">Aucune tâche trouvée</h3>
+                            <p class="empty-state-text">
+                                ${searchTerm ? 
+                                  "Aucune tâche ne correspond à votre recherche. Essayez différents termes." : 
+                                  "Vous n'avez pas encore de tâches dans cette catégorie. Commencez par en créer une nouvelle !"}
+                            </p>
+                            <button class="btn btn-primary pulse" id="emptyStateAddBtn">
+                                <svg class="btn-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                Ajouter une tâche
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Ajouter l'événement au bouton dans l'état vide
+                    document.getElementById('emptyStateAddBtn').addEventListener('click', () => {
+                        addTaskForm.style.display = 'block';
+                        document.getElementById('taskTitle').focus();
+                    });
+                } else {
+                    // Tri des tâches: priorité haute en premier, puis par statut et date
+                    filteredTasks.sort((a, b) => {
+                        // Priorité haute en premier
+                        if (a.priority === 'high' && b.priority !== 'high') return -1;
+                        if (a.priority !== 'high' && b.priority === 'high') return 1;
+                        
+                        // Ensuite par statut (en attente avant terminées)
+                        if (a.status === 'pending' && b.status === 'completed') return -1;
+                        if (a.status === 'completed' && b.status === 'pending') return 1;
+                        
+                        // Finalement par date de création (plus récent en premier)
+                        return new Date(b.createdAt) - new Date(a.createdAt);
+                    });
+                    
+                    // Génération du HTML des tâches
+                    tasksList.innerHTML = filteredTasks.map(task => {
+                        const priorityClass = `priority-${task.priority}`;
+                        const priorityLabel = {
+                            'low': 'Faible',
+                            'medium': 'Moyenne',
+                            'high': 'Haute'
+                        }[task.priority];
+                        
+                        return `
+                            <div class="task-item ${task.status === 'completed' ? 'completed' : ''}">
+                                <label class="task-checkbox">
+                                    <input type="checkbox" ${task.status === 'completed' ? 'checked' : ''} 
+                                           onchange="toggleTaskStatus(${task.id})">
+                                    <span class="checkmark"></span>
+                                </label>
+                                <div class="task-content">
+                                    <h3 class="task-title">${task.title}</h3>
+                                    <div class="task-meta">
+                                        <div class="task-priority">
+                                            <span class="priority-dot ${priorityClass}"></span>
+                                            ${priorityLabel}
+                                        </div>
+                                        <div class="task-date">
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            ${task.createdAt}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="task-actions">
+                                    <button class="action-btn btn-edit" onclick="editTask(${task.id})">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <button class="action-btn btn-delete" onclick="deleteTask(${task.id})">
+                                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+            
+            // Stockage local pour sauvegarder les tâches
+            function saveTasksToLocalStorage() {
+                localStorage.setItem('organizeMeTasks', JSON.stringify(tasks));
+            }
+            
+            function loadTasksFromLocalStorage() {
+                const savedTasks = localStorage.getItem('organizeMeTasks');
+                if (savedTasks) {
+                    tasks = JSON.parse(savedTasks);
+                }
+            }
+            
+            // Sauvegarder les tâches à chaque modification
+            const originalRenderTasks = renderTasks;
+            renderTasks = function() {
+                originalRenderTasks();
+                saveTasksToLocalStorage();
+            };
+            
+            // Charger les tâches au démarrage
+            loadTasksFromLocalStorage();
+            
+            // Initialiser l'affichage
+            renderTasks();
+            
+            // Vérifier et appliquer le thème sauvegardé
+            const savedDarkMode = localStorage.getItem('organizeMeDarkMode') === 'true';
+            if (savedDarkMode) {
+                darkMode = true;
+                document.body.classList.add('dark');
+                themeToggle.innerHTML = `
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                `;
+            }
+            
+            // Sauvegarder le thème
+            const originalThemeToggle = themeToggle.onclick;
+            themeToggle.onclick = function() {
+                originalThemeToggle();
+                localStorage.setItem('organizeMeDarkMode', darkMode);
+            };
+        });
+    </script>
+</body>
+</html>

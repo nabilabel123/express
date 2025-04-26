@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog API Explorer</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius-sm: 6px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-full: 9999px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.1rem 1rem;
+        }
+
+        .hero {
+            background: linear-gradient(120deg, #5465ff, #788bff);
+            border-radius: var(--radius-lg);
+            padding: 0.2rem 1rem;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 60%);
+            transform: rotate(30deg);
+        }
+
+        .hero-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            height: 100%;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+
+        .card-accent .card-icon {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--secondary);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background-color: var(--card-bg);
+            background-clip: padding-box;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-light);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            user-select: none;
+            border: 0;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: var(--radius-sm);
+            color: #fff;
+            background-color: var(--primary);
+            transition: var(--transition);
+            cursor: pointer;
+            width: 100%;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #7c3aed;
+        }
+
+        .btn-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .results-section {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-weight: 600;
+        }
+
+        .results-content {
+            padding: 1.5rem;
+        }
+
+        .results-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .results-placeholder-icon {
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+
+        pre {
+            background-color: #f8f9fa;
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            color: #334155;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem 0;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(59, 130, 246, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-container {
+            background-color: rgba(239, 68, 68, 0.08);
+            border-left: 4px solid var(--error);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .error-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            color: var(--error);
+        }
+
+        .error-title {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .error-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .copy-button:hover {
+            background: #f1f5f9;
+        }
+
+        .tooltip {
+            position: absolute;
+            top: -2.5rem;
+            right: 0;
+            background: var(--text-primary);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .copy-button:hover .tooltip {
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="hero">
+            <h1 class="hero-title">BlogExplorer</h1>
+            <p class="hero-subtitle">Explorez facilement les articles de votre blog par date ou par catégorie</p>
+        </header>
+
+        <div class="search-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Recherche par date</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label" for="year">Année</label>
+                        <input class="form-control" type="number" id="year" value="2023" min="2000" max="2030">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="month">Mois (optionnel)</label>
+                        <input class="form-control" type="number" id="month" min="1" max="12" placeholder="Entrez un mois (1-12)">
+                    </div>
+                    <button class="btn btn-primary" onclick="getPostsByDate()">
+                        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Rechercher par date
+                    </button>
+                </div>
+            </div>
+
+            <div class="card card-accent">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="card-title">Recherche par catégorie</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label" for="category">Nom de la catégorie</label>
+                        <input class="form-control" type="text" id="category" value="nodejs" placeholder="Ex: nodejs, api, database...">
+                    </div>
+                    <button class="btn btn-secondary" onclick="getPostsByCategory()">
+                        <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        Rechercher par catégorie
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <section class="results-section">
+            <div class="results-header">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+                Résultats de votre recherche
+            </div>
+            <div class="results-content" id="results">
+                <div class="results-placeholder">
+                    <div class="results-placeholder-icon">
+                        <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 16l2.879-2.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242zM21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <p>Utilisez les formulaires ci-dessus pour afficher les résultats de votre recherche</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        async function getPostsByDate() {
+            const year = document.getElementById('year').value;
+            const month = document.getElementById('month').value;
+            
+            let url = `/blog/posts/${year}`;
+            if (month) url += `/${month}`;
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Une erreur est survenue lors de la récupération des données');
+                }
+                
+                displayResults(data);
+            } catch (error) {
+                displayError("Erreur de recherche", error.message);
+            }
+        }
+        
+        async function getPostsByCategory() {
+            const category = document.getElementById('category').value;
+            
+            if (!category.trim()) {
+                displayError("Erreur de validation", "Veuillez saisir une catégorie");
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`/blog/categories/${category}/posts`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Une erreur est survenue lors de la récupération des données');
+                }
+                
+                displayResults(data);
+            } catch (error) {
+                displayError("Erreur de recherche", error.message);
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('results').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            `;
+        }
+        
+        function displayResults(data) {
+            const resultsElement = document.getElementById('results');
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const postCount = Array.isArray(data) ? data.length : 'N/A';
+            
+            resultsElement.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success);">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Requête réussie (${postCount} résultat${postCount !== 1 ? 's' : ''})</span>
+                    </div>
+                    <div style="color: var(--text-light); font-size: 0.875rem;">${timestamp}</div>
+                </div>
+                <div style="position: relative;">
+                    <button class="copy-button" onclick="copyToClipboard()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                        <span class="tooltip">Copier</span>
+                    </button>
+                    <pre id="json-result">${JSON.stringify(data, null, 2)}</pre>
+                </div>
+            `;
+        }
+        
+        function displayError(title, message) {
+            document.getElementById('results').innerHTML = `
+                <div class="error-container">
+                    <div class="error-header">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="error-title">${title}</h3>
+                    </div>
+                    <p class="error-message">${message}</p>
+                </div>
+                <div style="text-align: center; padding: 1.5rem 0;">
+                    <p style="color: var(--text-secondary); font-size: 0.875rem;">Veuillez modifier vos critères de recherche et réessayer</p>
+                </div>
+            `;
+        }
+        
+        function copyToClipboard() {
+            const jsonElement = document.getElementById('json-result');
+            if (!jsonElement) return;
+            
+            const text = jsonElement.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const tooltip = document.querySelector('.tooltip');
+                if (tooltip) {
+                    tooltip.textContent = 'Copié !';
+                    setTimeout(() => {
+                        tooltip.textContent = 'Copier';
+                    }, 2000);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
