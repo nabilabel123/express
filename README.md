@@ -24,6 +24,16 @@ ou
 ## Exercice 2: Configuration d'un projet ExpressJS
 Créez un projet ExpressJS complet avec la structure de répertoires recommandée et configurez-le pour servir des fichiers statiques et gérer différentes routes.
 
+## Lancez le serveur :
+ ``` bash command 
+   node server.js
+ ```
+## pour tester le projet : http://localhost:3000
+## Affichage
+![image](https://github.com/user-attachments/assets/b707638f-d048-4577-b0ff-f9188f246f92)
+
+
+
 
    
 
